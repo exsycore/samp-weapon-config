@@ -2284,7 +2284,7 @@ stock PlayerText:WC_CreatePlayerTextDraw(playerid, Float:x, Float:y, WC_CONST te
 {
 	if (playerid < 0 || playerid >= MAX_PLAYERS) return PlayerText:INVALID_TEXT_DRAW;
 	#if defined _INC_y_va
-		new PlayerText:td = CreatePlayerTextDraw(playerid, x, y, text, ___(4));
+		new PlayerText:td = va_CreatePlayerTextDraw(playerid, x, y, text, ___(4));
 	#else
 		new PlayerText:td = CreatePlayerTextDraw(playerid, x, y, text);
 	#endif
@@ -2414,7 +2414,7 @@ stock WC_PlayerTextDrawSetString(playerid, PlayerText:text, WC_CONST string[])
 	if (playerid < 0 || playerid >= MAX_PLAYERS) return 0;
 	if (_:text < 0 || text >= PlayerText:MAX_PLAYER_TEXT_DRAWS || s_InternalPlayerTextDraw[playerid][text]) return 0;
 	#if defined _INC_y_va
-		return PlayerTextDrawSetString(playerid, text, string, ___(3));
+		return va_PlayerTextDrawSetString(playerid, text, string, ___(3));
 	#else
 		return PlayerTextDrawSetString(playerid, text, string);
 	#endif
@@ -4970,10 +4970,12 @@ static ScriptInit()
 		s_ClassSpawnInfo[i][e_Skin] = -1;
 	}
 
-	s_HealthBarBorder = TextDrawCreate(546.0, 66.7, "LD_SPAC:white");
+	// s_HealthBarBorder = TextDrawCreate(546.0, 66.7, "LD_SPAC:white");
+	s_HealthBarBorder = Text:INVALID_TEXT_DRAW;
 
 	if (s_HealthBarBorder == Text:INVALID_TEXT_DRAW) {
-		printf("(wc) WARN: Unable to create healthbar border textdraw");
+		// printf("(wc) WARN: Unable to create healthbar border textdraw");
+		printf("(wc) EDIT: Server is using a custom healthbar");
 	} else {
 		s_InternalTextDraw[s_HealthBarBorder] = true;
 
@@ -4982,10 +4984,12 @@ static ScriptInit()
 		TextDrawFont		(s_HealthBarBorder, TEXT_DRAW_FONT_SPRITE_DRAW);
 	}
 
-	s_HealthBarBackground = TextDrawCreate(548.0, 68.8, "LD_SPAC:white");
+	// s_HealthBarBackground = TextDrawCreate(548.0, 68.8, "LD_SPAC:white");
+	s_HealthBarBackground = Text:INVALID_TEXT_DRAW;
 
 	if (s_HealthBarBackground == Text:INVALID_TEXT_DRAW) {
-		printf("(wc) WARN: Unable to create healthbar background textdraw");
+		// printf("(wc) WARN: Unable to create healthbar background textdraw");
+		printf("(wc) EDIT: Server is using a custom healthbar background");
 	} else {
 		s_InternalTextDraw[s_HealthBarBackground] = true;
 
@@ -5205,7 +5209,8 @@ static UpdateHealthBar(playerid, bool:force = false)
 	if (health != s_LastSentHealth[playerid]) {
 		s_LastSentHealth[playerid] = health;
 
-		SetPlayerHealth(playerid, 8000000.0 + float(health));
+		// SetPlayerHealth(playerid, 8000000.0 + float(health));
+		// SetPlayerHealth(playerid, float(health));
 
 		if (s_HealthBarVisible[playerid] && !s_IsDying[playerid]) {
 			if (s_HealthBarForeground[playerid] == PlayerText:INVALID_TEXT_DRAW) {
@@ -5270,15 +5275,17 @@ static SetHealthBarVisible(playerid, bool:toggle)
 		return;
 	}
 
-	s_HealthBarVisible[playerid] = toggle;
+	s_HealthBarVisible[playerid] = false;
 
 	if (toggle) {
 		if (s_HealthBarBorder != Text:INVALID_TEXT_DRAW) {
 			TextDrawShowForPlayer(playerid, s_HealthBarBorder);
+			// TextDrawDestroy(s_HealthBarBorder);
 		}
 
 		if (s_HealthBarBackground != Text:INVALID_TEXT_DRAW) {
 			TextDrawShowForPlayer(playerid, s_HealthBarBackground);
+			// TextDrawDestroy(s_HealthBarBackground);
 		}
 
 		UpdateHealthBar(playerid, true);
@@ -5294,6 +5301,8 @@ static SetHealthBarVisible(playerid, bool:toggle)
 		if (s_HealthBarBackground != Text:INVALID_TEXT_DRAW) {
 			TextDrawHideForPlayer(playerid, s_HealthBarBackground);
 		}
+
+		UpdateHealthBar(playerid, true);
 	}
 }
 
@@ -6334,14 +6343,14 @@ static DamageFeedUpdate(playerid, bool:modified = false)
 		}
 
 		if (modified) {
-			DamageFeedUpdateText(playerid);
+			// DamageFeedUpdateText(playerid);
 
 			s_DamageFeedLastUpdate[playerid] = tick;
 		}
 	}
 }
 
-static DamageFeedUpdateText(playerid)
+static stock DamageFeedUpdateText(playerid)
 {
 	new buf[64 * WC_FEED_HEIGHT] = "";
 
@@ -6692,6 +6701,7 @@ static SetFakeHealth(playerid, health)
 	}
 
 	s_FakeHealth{playerid} = health;
+	SetPlayerHealth(playerid, float(health));
 
 	return 1;
 }
@@ -6703,6 +6713,7 @@ static SetFakeArmour(playerid, armour)
 	}
 
 	s_FakeArmour{playerid} = armour;
+	SetPlayerArmour(playerid, float(armour));
 
 	return 1;
 }
