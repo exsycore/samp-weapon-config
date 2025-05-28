@@ -70,6 +70,7 @@ This include file requires [SKY](https://github.com/oscar-broman/SKY/) or [Pawn.
         - Shotgun kills make you fly backward like in GTA:VC (unless killed from behind)
 - **Customs**
     - Health Original Bar
+    - Armour Original Bar
 
 ## Implementation details
 
