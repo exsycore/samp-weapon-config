@@ -68,6 +68,8 @@ This include file requires [SKY](https://github.com/oscar-broman/SKY/) or [Pawn.
     - Different animation depending on weapon/bodypart, for example:
         - Headshots make you fall back with both hands in your face
         - Shotgun kills make you fly backward like in GTA:VC (unless killed from behind)
+- **Customs**
+    - Health Original Bar
 
 ## Implementation details
 
